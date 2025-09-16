@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Do or Dare - Pumpfun Challenge Platform</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎯 DO OR DARE</h1>
+                </div>
+                <div class="header-buttons">
+                    <button id="submitDareBtn" class="btn btn-primary">SUBMIT DARE</button>
+                    <button id="adminBtn" class="btn btn-primary">ADMIN</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container">
+            <!-- Livestream Section -->
+            <section class="livestream-section">
+                <div class="livestream-header">
+                    <h2><span class="live-dot-large"></span> LIVE STREAM</h2>
+                    <p>Watch the action unfold live!</p>
+                </div>
+                <div class="stream-controls initial-controls">
+                    <button id="toggleStream" class="stream-btn">Show Stream</button>
+                    <button id="openPumpfun" class="stream-btn">Open Pump.fun</button>
+                </div>
+                <div class="livestream-container hidden" id="livestreamContainer">
+                    <div class="stream-wrapper">
+                        <!-- Live Stream Container -->
+                        <div class="stream-container" id="streamContainer">
+                            <iframe 
+                                id="livestreamFrame"
+                                src="about:blank"
+                                frameborder="0" 
+                                allowfullscreen
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
+                                referrerpolicy="no-referrer"
+                                loading="lazy">
+                            </iframe>
+                            <!-- Loading State -->
+                            <div class="stream-preview loading" id="streamPreview">
+                                <div class="preview-content">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="stream-overlay">
+                            <div class="stream-status">
+                                <span class="live-dot"></span>
+                                <span>LOADING</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stream-controls stream-controls-bottom">
+                        <button id="toggleStreamBottom" class="stream-btn">Hide Stream</button>
+                        <button id="openPumpfunBottom" class="stream-btn">Open Pump.fun</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Dares Section - FIRST -->
+            <section class="dares-section active-section">
+                <div class="section-header">
+                    <h2>Active Dares</h2>
+                    <p>These dares are currently being considered!</p>
+                </div>
+                <div class="dares-container" id="activeDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Suggested Dares Section - SECOND -->
+            <section class="dares-section suggested-section">
+                <div class="section-header">
+                    <h2>Suggested Dares</h2>
+                    <p>Vote on your favorite dares to push them to the active board!</p>
+                </div>
+                <div class="dares-container" id="suggestedDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Completed Dares Section - THIRD -->
+            <section class="dares-section completed-section">
+                <div class="section-header">
+                    <h2>Completed Dares</h2>
+                    <p>Successfully completed challenges!</p>
+                </div>
+                <div class="dares-container" id="completedDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <!-- Dare Submission Modal -->
+            <div id="submitModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Submit a Dare</h2>
+                    <form id="dareForm">
+                        <div class="form-group">
+                            <label for="dareTitle">Dare Title:</label>
+                            <input type="text" id="dareTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dareDescription">Dare Description:</label>
+                            <textarea id="dareDescription" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="initialReward">Initial Reward ($):</label>
+                            <input type="number" id="initialReward" min="5" step="5" value="50" required>
+                        </div>
+                        <button type="submit" class="submit-dare-btn">SUBMIT DARE</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Admin Modal -->
+            <div id="adminModal" class="modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <h2>Admin Login</h2>
+                    <form id="adminForm">
+                        <div class="form-group">
+                            <label for="adminPassword">Password:</label>
+                            <input type="password" id="adminPassword" required>
+                        </div>
+                        <button type="submit" class="submit-dare-btn">LOGIN</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="admin-panel hidden">
+                <div class="admin-header">
+                    <h3>🔧 Admin Panel</h3>
+                    <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+                </div>
+                <div class="admin-actions">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
