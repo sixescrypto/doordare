@@ -12,6 +12,15 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
+// Livestream Configuration
+const LIVESTREAM_CONFIG = {
+    mintId: 'AVqgmCg5tXWYiHSMgSyJ7XpXjCMDnJ33GcrVUDvopump' // Change this ID to switch to a different stream
+    // This mint ID is used for:
+    // - Livestream API calls
+    // - Pump.fun page links  
+    // - Contract address display
+};
+
 // Application State
 let appState = {
     suggestedDares: [],
@@ -41,6 +50,8 @@ const elements = {
     contractAddressModal: document.getElementById('contractAddressModal'),
     closeHowItWorks: document.getElementById('closeHowItWorks'),
     closeContractAddress: document.getElementById('closeContractAddress'),
+    contractAddressValue: document.getElementById('contractAddressValue'),
+    copyAddressBtn: document.getElementById('copyAddressBtn'),
     dareForm: document.getElementById('dareForm'),
     adminForm: document.getElementById('adminForm'),
     suggestedDares: document.getElementById('suggestedDares'),
@@ -85,6 +96,9 @@ function bindEventListeners() {
     
     // Close Contract Address modal with custom button
     elements.closeContractAddress.addEventListener('click', () => closeModal('contractAddressModal'));
+    
+    // Copy contract address to clipboard
+    elements.copyAddressBtn.addEventListener('click', copyContractAddress);
     
     // Close modal functionality
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -138,6 +152,10 @@ function bindEventListeners() {
 // Modal Functions
 function openModal(modalId) {
     document.getElementById(modalId).style.display = 'block';
+    // Populate contract address when opening the modal
+    if (modalId === 'contractAddressModal') {
+        populateContractAddress();
+    }
 }
 
 function closeModal(modalId) {
@@ -148,6 +166,30 @@ function closeModal(modalId) {
     }
     if (modalId === 'adminModal') {
         elements.adminForm.reset();
+    }
+}
+
+// Contract Address Functions
+function populateContractAddress() {
+    if (elements.contractAddressValue) {
+        elements.contractAddressValue.value = LIVESTREAM_CONFIG.mintId;
+    }
+}
+
+async function copyContractAddress() {
+    try {
+        await navigator.clipboard.writeText(LIVESTREAM_CONFIG.mintId);
+        showNotification('Contract address copied to clipboard!');
+        
+        // Visual feedback on copy button
+        const originalText = elements.copyAddressBtn.textContent;
+        elements.copyAddressBtn.textContent = '✅';
+        setTimeout(() => {
+            elements.copyAddressBtn.textContent = originalText;
+        }, 1000);
+    } catch (error) {
+        console.error('Failed to copy contract address:', error);
+        showNotification('Failed to copy address. Please copy manually.');
     }
 }
 
@@ -629,7 +671,7 @@ function toggleStreamVisibility() {
 }
 
 function loadLivestream() {
-    const livestreamApiUrl = 'https://livestream-api.pump.fun/livestream?mintId=V5cCiSixPLAiEDX2zZquT5VuLm4prr5t35PWmjNpump';
+    const livestreamApiUrl = `https://livestream-api.pump.fun/livestream?mintId=${LIVESTREAM_CONFIG.mintId}`;
     
     // Update stream status to show loading
     const statusElement = document.querySelector('.stream-status span:last-child');
@@ -966,8 +1008,8 @@ function handleStreamLoadError() {
 }
 
 function openPumpfunPage() {
-    const pumpfunUrl = 'https://pump.fun/coin/V5cCiSixPLAiEDX2zZquT5VuLm4prr5t35PWmjNpump';
-    const livestreamUrl = 'https://livestream-api.pump.fun/livestream?mintId=V5cCiSixPLAiEDX2zZquT5VuLm4prr5t35PWmjNpump';
+    const pumpfunUrl = `https://pump.fun/coin/${LIVESTREAM_CONFIG.mintId}`;
+    const livestreamUrl = `https://livestream-api.pump.fun/livestream?mintId=${LIVESTREAM_CONFIG.mintId}`;
     
     // Open both the main coin page and livestream API in separate tabs
     window.open(pumpfunUrl, '_blank');
@@ -982,24 +1024,24 @@ function openPumpfunPage() {
 async function saveToFirestore() {
     try {
         // Save all dares to a single document
+        // Note: userVotes are kept local only to prevent vote interference between users
         await db.collection('appData').doc('dares').set({
             suggestedDares: appState.suggestedDares,
             activeDares: appState.activeDares,
             completedDares: appState.completedDares,
             nextDareId: appState.nextDareId,
-            userVotes: appState.userVotes,
             lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
         });
         console.log('Data saved to Firebase successfully');
     } catch (error) {
         console.error('Error saving to Firebase:', error);
         // Fallback to localStorage if Firebase fails
+        // Note: userVotes are kept local only, no need to sync them
         localStorage.setItem('doOrDareApp', JSON.stringify({
             suggestedDares: appState.suggestedDares,
             activeDares: appState.activeDares,
             completedDares: appState.completedDares,
-            nextDareId: appState.nextDareId,
-            userVotes: appState.userVotes
+            nextDareId: appState.nextDareId
         }));
     }
 }
@@ -1013,7 +1055,8 @@ async function loadFromFirestore() {
             appState.activeDares = data.activeDares || [];
             appState.completedDares = data.completedDares || [];
             appState.nextDareId = data.nextDareId || 1;
-            appState.userVotes = data.userVotes || {};
+            // Keep userVotes as local only - don't load from Firebase
+            appState.userVotes = appState.userVotes || {};
             console.log('Data loaded from Firebase successfully');
         } else {
             console.log('No data found in Firebase, starting fresh');
@@ -1028,7 +1071,8 @@ async function loadFromFirestore() {
             appState.activeDares = data.activeDares || [];
             appState.completedDares = data.completedDares || [];
             appState.nextDareId = data.nextDareId || 1;
-            appState.userVotes = data.userVotes || {};
+            // Keep userVotes as local only - don't load from localStorage either
+            appState.userVotes = appState.userVotes || {};
         }
     }
 }
@@ -1049,7 +1093,10 @@ function setupRealtimeListener() {
             appState.activeDares = data.activeDares || [];
             appState.completedDares = data.completedDares || [];
             appState.nextDareId = data.nextDareId || 1;
-            appState.userVotes = data.userVotes || {};
+            
+            // DON'T overwrite user votes - keep them local to this user/browser
+            // appState.userVotes = data.userVotes || {}; // REMOVED
+            
             renderAllDares();
             console.log('Real-time update received from Firebase');
         }
