@@ -48,6 +48,29 @@ body {
     left: 10px;
     top: 50%;
     transform: translateY(-50%);
+    gap: 10px;
+}
+
+/* Twitter Button */
+.twitter-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.twitter-btn:hover {
+    text-decoration: none;
+}
+
+.twitter-icon {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
 }
 
 .header-logo-section {
@@ -1143,6 +1166,28 @@ body {
         left: 5px;
         top: 50%;
         transform: translateY(-50%);
+        gap: 8px;
+    }
+    
+    .header-left .btn {
+        height: auto !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .twitter-btn {
+        font-size: 0.47rem !important;
+        padding: 4px 3px !important;
+        min-width: auto !important;
+        width: auto !important;
+        flex-shrink: 1;
+    }
+    
+    .twitter-icon {
+        width: 12px !important;
+        height: 12px !important;
     }
     
     .header-logo-section {
@@ -1262,5 +1307,135 @@ body {
     .btn-secondary {
         padding: 4px 7px;
         font-size: 0.47rem;
+    }
+}
+
+/* Ultra Mobile Responsive - for phones 530px and below */
+@media (max-width: 530px) {
+    .header {
+        padding: 2px 0;
+        height: 120px; /* Increased height to accommodate stacked buttons */
+    }
+    
+    .header-left {
+        position: absolute;
+        left: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column; /* Stack buttons vertically */
+        gap: 6px; /* 10% bigger than 5px */
+        align-items: center; /* Center the X button underneath CONTRACT ADDRESS */
+    }
+    
+    /* Scale all buttons: 50% down, +25%, +10% = net 41.25% of original */
+    .btn {
+        padding: 4px 6px !important; /* 10% bigger than 3px 5px */
+        font-size: 0.41rem !important; /* 10% bigger than 0.375rem */
+        border-radius: 11px !important; /* 10% bigger than 10px */
+        min-width: 48px !important; /* 10% bigger than 44px */
+        border-width: 1px !important; /* Keep at 1px */
+    }
+    
+    .btn-secondary {
+        padding: 4px 5px !important; /* 10% bigger than 3px 4px */
+        font-size: 0.33rem !important; /* 10% bigger than 0.3rem */
+    }
+    
+    .twitter-btn {
+        padding: 4px 4px !important; /* 10% bigger than 3px 3px */
+        min-width: auto !important;
+        width: auto !important;
+    }
+    
+    .twitter-icon {
+        width: 9px !important; /* 10% bigger than 8px */
+        height: 9px !important;
+    }
+    
+    /* Adjust header buttons on the right */
+    .header-buttons {
+        flex-direction: column;
+        gap: 4px; /* 10% bigger than 3px */
+    }
+    
+    .header-content {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    /* Adjust logo size for smaller screens */
+    .logo-image {
+        height: 180px; /* Smaller than 216px */
+    }
+    
+    .header-logo-section {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+    
+    /* Scale down dare card elements for ultra-mobile */
+    .dares-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .dare-card {
+        padding: 15px;
+    }
+    
+    .dare-meta {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .voting-section {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+    
+    .vote-group {
+        gap: 3px;
+    }
+    
+    .vote-label {
+        font-size: 0.65rem;
+        font-weight: 500;
+    }
+    
+    .vote-controls {
+        gap: 5px;
+    }
+    
+    .vote-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+    
+    .vote-count {
+        font-size: 0.8rem;
+        min-width: 25px;
+    }
+    
+    .reward-amount {
+        font-size: 1.2rem;
+        font-weight: 600;
+    }
+    
+    .dare-title {
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .dare-description {
+        font-size: 0.85rem;
+        margin-bottom: 15px;
     }
 }
