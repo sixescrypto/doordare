@@ -22,37 +22,50 @@ body {
 /* Header Styles */
 .header {
     background: #000000;
-    border-bottom: 1px solid #333;
-    padding: 20px 0;
+    border-bottom: 1px solid #ff0000;
+    padding: 5px 0;
     position: sticky;
     top: 0;
     z-index: 100;
+    overflow: visible;
+    height: 120px;
 }
 
 .header .container {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
+    height: 100%;
+}
+
+.header-logo-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
 }
 
 .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 15px;
+    justify-content: center;
+    width: 100%;
+    overflow: visible;
 }
 
-.logo h1 {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 2px;
+.logo-image {
+    height: 300px;
+    width: auto;
+    max-width: 1600px;
+    object-fit: contain;
+    display: block;
 }
 
 .live-indicator {
@@ -148,7 +161,7 @@ body {
 
 /* Main Content */
 .main {
-    padding: 40px 0;
+    padding: 120px 0 40px 0;
 }
 
 /* Livestream Section */
@@ -771,7 +784,7 @@ body {
     background-color: #1a1a1a;
     margin: 10% auto;
     padding: 30px;
-    border: 1px solid #333;
+    border: 2px solid #ff0000;
     border-radius: 15px;
     width: 90%;
     max-width: 500px;
@@ -846,6 +859,67 @@ body {
     background: #cc0000;
 }
 
+/* How It Works Modal */
+.how-it-works-modal .modal-content {
+    background: #000000;
+    border: 2px solid #ffffff;
+    border-radius: 20px;
+    max-width: 600px;
+    padding: 40px;
+    text-align: center;
+}
+
+.how-it-works-header {
+    margin-bottom: 30px;
+}
+
+.how-it-works-content h2 {
+    color: #ffffff;
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0;
+    letter-spacing: 2px;
+}
+
+.story-section {
+    text-align: left;
+    margin: 30px 0;
+    color: #ffffff;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.story-section .do-text {
+    color: #00ff00;
+}
+
+.story-section .dare-text {
+    color: #ff0000;
+}
+
+.story-section em {
+    color: #cccccc;
+    font-style: italic;
+}
+
+.lets-dare-btn {
+    background: #ff0000;
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.lets-dare-btn:hover {
+    background: #cc0000;
+    transform: scale(1.05);
+}
+
 /* Admin Panel */
 .admin-panel {
     position: fixed;
@@ -913,11 +987,16 @@ body {
 @media (max-width: 768px) {
     .header .container {
         flex-direction: column;
-        gap: 20px;
+        gap: 10px;
     }
     
-    .logo h1 {
-        font-size: 1.5rem;
+    .header-logo-section {
+        padding: 20px 0 15px 0;
+    }
+    
+    .logo-image {
+        height: 120px;
+        max-width: 600px;
     }
     
     .livestream-section {
@@ -998,4 +1077,36 @@ body {
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .logo-image {
+        height: 200px;
+        max-width: 1200px;
+    }
+    
+    .header {
+        padding: 3px 0;
+        height: 110px;
+    }
+    
+    .main {
+        padding: 100px 0 40px 0;
+    }
+    
+    .header-content {
+        top: 15px;
+        right: 15px;
+    }
+    
+    .header-buttons {
+        flex-direction: column;
+        gap: 6px;
+    }
+    
+    .btn {
+        padding: 6px 10px;
+        font-size: 0.7rem;
+    }
 }

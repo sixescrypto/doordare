@@ -1,3 +1,17 @@
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDaHwBJS6IEtdwYLtptKJPWufvxKDoh2T0",
+    authDomain: "doordare-edf1b.firebaseapp.com",
+    projectId: "doordare-edf1b",
+    storageBucket: "doordare-edf1b.firebasestorage.app",
+    messagingSenderId: "417997891539",
+    appId: "1:417997891539:web:5f3977b84cbb4d3012b126"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // Application State
 let appState = {
     suggestedDares: [],
@@ -5,7 +19,7 @@ let appState = {
     completedDares: [],
     isAdmin: false,
     nextDareId: 1,
-    adminPassword: 'admin123', // In production, this should be handled securely
+    adminPassword: 'Team6123!', // In production, this should be handled securely
     userVotes: {}, // Track user votes: { dareId: { votes: 'up'|'down'|null, reward: 'up'|'down'|null } }
     pagination: {
         suggestedDares: { currentPage: 1, itemsPerPage: 5 },
@@ -18,8 +32,11 @@ let appState = {
 const elements = {
     submitDareBtn: document.getElementById('submitDareBtn'),
     adminBtn: document.getElementById('adminBtn'),
+    howItWorksBtn: document.getElementById('howItWorksBtn'),
     submitModal: document.getElementById('submitModal'),
     adminModal: document.getElementById('adminModal'),
+    howItWorksModal: document.getElementById('howItWorksModal'),
+    closeHowItWorks: document.getElementById('closeHowItWorks'),
     dareForm: document.getElementById('dareForm'),
     adminForm: document.getElementById('adminForm'),
     suggestedDares: document.getElementById('suggestedDares'),
@@ -39,15 +56,11 @@ const elements = {
 };
 
 // Initialize the application
-function init() {
-    loadFromStorage();
+async function init() {
+    await loadFromFirestore();
     bindEventListeners();
     renderAllDares();
-    
-    // Add some sample data if none exists
-    if (appState.suggestedDares.length === 0) {
-        addSampleData();
-    }
+    setupRealtimeListener(); // Enable real-time updates
     
     // Automatically load livestream on page load
     setTimeout(() => {
@@ -60,6 +73,10 @@ function bindEventListeners() {
     // Modal controls
     elements.submitDareBtn.addEventListener('click', () => openModal('submitModal'));
     elements.adminBtn.addEventListener('click', () => openModal('adminModal'));
+    elements.howItWorksBtn.addEventListener('click', () => openModal('howItWorksModal'));
+    
+    // Close How It Works modal with custom button
+    elements.closeHowItWorks.addEventListener('click', () => closeModal('howItWorksModal'));
     
     // Close modal functionality
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -79,6 +96,13 @@ function bindEventListeners() {
     elements.dareForm.addEventListener('submit', handleDareSubmission);
     elements.adminForm.addEventListener('submit', handleAdminLogin);
     elements.logoutBtn.addEventListener('click', handleLogout);
+    
+    // Admin button delegation
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('admin-btn')) {
+            handleAdminAction(e);
+        }
+    });
     
     // Stream controls
     elements.toggleStream.addEventListener('click', toggleLivestream);
@@ -131,7 +155,7 @@ function handleDareSubmission(e) {
     
     appState.suggestedDares.unshift(newDare);
     resetPagination('suggestedDares'); // Reset to page 1 when new dare is added
-    saveToStorage();
+    saveToFirestore();
     renderAllDares();
     closeModal('submitModal');
     
@@ -206,7 +230,6 @@ function renderDareSection(containerId, dares, status) {
     
     // Bind voting event listeners
     bindVotingListeners();
-    bindAdminListeners();
     bindPaginationListeners(paginationKey);
 }
 
@@ -247,7 +270,7 @@ function handlePaginationClick(e) {
     const page = parseInt(e.target.dataset.page);
     
     appState.pagination[section].currentPage = page;
-    saveToStorage();
+    saveToFirestore();
     renderAllDares();
 }
 
@@ -422,17 +445,11 @@ function handleVoting(e) {
         }
     }
     
-    saveToStorage();
+    saveToFirestore();
     renderAllDares();
 }
 
 // Admin Actions
-function bindAdminListeners() {
-    document.querySelectorAll('.admin-btn').forEach(btn => {
-        btn.addEventListener('click', handleAdminAction);
-    });
-}
-
 function handleAdminAction(e) {
     const dareId = parseInt(e.target.dataset.id);
     const action = e.target.dataset.action;
@@ -467,7 +484,6 @@ function handleAdminAction(e) {
             break;
             
         case 'delete':
-            const dare = findDareById(dareId);
             const dareType = dare ? dare.status : 'unknown';
             const confirmMessage = dareType === 'completed' 
                 ? 'Are you sure you want to delete this completed dare? This action cannot be undone.' 
@@ -480,7 +496,7 @@ function handleAdminAction(e) {
             break;
     }
     
-    saveToStorage();
+    saveToFirestore();
     renderAllDares();
 }
 
@@ -518,7 +534,7 @@ function showNotification(message) {
     const notification = document.createElement('div');
     notification.style.cssText = `
         position: fixed;
-        top: 20px;
+        top: 80px;
         right: 20px;
         background: #ff0000;
         color: white;
@@ -920,7 +936,80 @@ function openPumpfunPage() {
     showNotification('Opening Pump.fun and livestream API in new tabs...');
 }
 
-// Storage Functions
+// Firebase Storage Functions
+async function saveToFirestore() {
+    try {
+        // Save all dares to a single document
+        await db.collection('appData').doc('dares').set({
+            suggestedDares: appState.suggestedDares,
+            activeDares: appState.activeDares,
+            completedDares: appState.completedDares,
+            nextDareId: appState.nextDareId,
+            userVotes: appState.userVotes,
+            lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        console.log('Data saved to Firebase successfully');
+    } catch (error) {
+        console.error('Error saving to Firebase:', error);
+        // Fallback to localStorage if Firebase fails
+        localStorage.setItem('doOrDareApp', JSON.stringify({
+            suggestedDares: appState.suggestedDares,
+            activeDares: appState.activeDares,
+            completedDares: appState.completedDares,
+            nextDareId: appState.nextDareId,
+            userVotes: appState.userVotes
+        }));
+    }
+}
+
+async function loadFromFirestore() {
+    try {
+        const doc = await db.collection('appData').doc('dares').get();
+        if (doc.exists) {
+            const data = doc.data();
+            appState.suggestedDares = data.suggestedDares || [];
+            appState.activeDares = data.activeDares || [];
+            appState.completedDares = data.completedDares || [];
+            appState.nextDareId = data.nextDareId || 1;
+            appState.userVotes = data.userVotes || {};
+            console.log('Data loaded from Firebase successfully');
+        } else {
+            console.log('No data found in Firebase, starting fresh');
+        }
+    } catch (error) {
+        console.error('Error loading from Firebase:', error);
+        // Fallback to localStorage if Firebase fails
+        const stored = localStorage.getItem('doOrDareApp');
+        if (stored) {
+            const data = JSON.parse(stored);
+            appState.suggestedDares = data.suggestedDares || [];
+            appState.activeDares = data.activeDares || [];
+            appState.completedDares = data.completedDares || [];
+            appState.nextDareId = data.nextDareId || 1;
+            appState.userVotes = data.userVotes || {};
+        }
+    }
+}
+
+// Set up real-time listener for live updates
+function setupRealtimeListener() {
+    db.collection('appData').doc('dares').onSnapshot((doc) => {
+        if (doc.exists) {
+            const data = doc.data();
+            appState.suggestedDares = data.suggestedDares || [];
+            appState.activeDares = data.activeDares || [];
+            appState.completedDares = data.completedDares || [];
+            appState.nextDareId = data.nextDareId || 1;
+            appState.userVotes = data.userVotes || {};
+            renderAllDares();
+            console.log('Real-time update received from Firebase');
+        }
+    }, (error) => {
+        console.error('Error in real-time listener:', error);
+    });
+}
+
+// Legacy localStorage functions (keeping as fallback)
 function saveToStorage() {
     localStorage.setItem('doOrDareApp', JSON.stringify({
         suggestedDares: appState.suggestedDares,
@@ -1000,7 +1089,7 @@ function addSampleData() {
         }
     });
     
-    saveToStorage();
+    saveToFirestore();
 }
 
 // Initialize the app when the DOM is loaded

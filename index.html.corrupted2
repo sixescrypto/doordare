@@ -2,27 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width                             <div class="section-header">
+                    <h2>Suggested Dares</h2>
+                    <p>Vote on your favorite dares to push them to the active board!</p>
+                </div>div class="section-header">
+                    <h2>Active Dares</h2>
+                    <p>These dares are currently being considered!</p>
+                </div>ice-width, initial-scale=1.0">
     <title>Do or Dare - Pumpfun Challenge Platform</title>
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 </head>
 <body>
     <!-- Header -->
     <header class="header">
         <div class="container">
-            <div class="header-logo-section">
-                <div class="logo">
-                    <img src="Doordare.png" alt="Do or Dare" class="logo-image">
-                </div>
-            </div>
             <div class="header-content">
+                <div class="logo">
+                    <h1>🎯 DO OR DARE</h1>
+                </div>
                 <div class="header-buttons">
-                    <button id="howItWorksBtn" class="btn btn-primary">HOW IT WORKS</button>
                     <button id="submitDareBtn" class="btn btn-primary">SUBMIT DARE</button>
                     <button id="adminBtn" class="btn btn-primary">ADMIN</button>
                 </div>
@@ -36,14 +35,10 @@
             <!-- Livestream Section -->
             <section class="livestream-section">
                 <div class="livestream-header">
-                    <h2><span class="live-dot-large"></span> LIVE STREAM</h2>
+                    <h2>🔴 LIVE STREAM</h2>
                     <p>Watch the action unfold live!</p>
                 </div>
-                <div class="stream-controls initial-controls">
-                    <button id="toggleStream" class="stream-btn">Show Stream</button>
-                    <button id="openPumpfun" class="stream-btn">Open Pump.fun</button>
-                </div>
-                <div class="livestream-container hidden" id="livestreamContainer">
+                <div class="livestream-container">
                     <div class="stream-wrapper">
                         <!-- Live Stream Container -->
                         <div class="stream-container" id="streamContainer">
@@ -67,52 +62,12 @@
                                 <span class="live-dot"></span>
                                 <span>LOADING</span>
                             </div>
-                                        const firebaseConfig = {
-                          apiKey: "your-api-key-here",
-                          authDomain: "your-project.firebaseapp.com",
-                          projectId: "your-project-id",
-                          storageBucket: "your-project.appspot.com",
-                          messagingSenderId: "123456789",
-                          appId: "your-app-id"
-                        };        </div>
+                        </div>
                     </div>
-                    <div class="stream-controls stream-controls-bottom">
-                        <button id="toggleStreamBottom" class="stream-btn">Hide Stream</button>
-                        <button id="openPumpfunBottom" class="stream-btn">Open Pump.fun</button>
+                    <div class="stream-controls">
+                        <button id="toggleStream" class="stream-btn">Hide Stream</button>
+                        <button id="openPumpfun" class="stream-btn">Open Pump.fun</button>
                     </div>
-                </div>
-            </section>
-
-            <!-- Active Dares Section - FIRST -->
-            <section class="dares-section active-section">
-                <div class="section-header">
-                    <h2>Active Dares</h2>
-                    <p>These dares are currently being considered!</p>
-                </div>
-                <div class="dares-container" id="activeDares">
-                    <!-- Dares will be dynamically inserted here -->
-                </div>
-            </section>
-
-            <!-- Suggested Dares Section - SECOND -->
-            <section class="dares-section suggested-section">
-                <div class="section-header">
-                    <h2>Suggested Dares</h2>
-                    <p>Vote on your favorite dares to push them to the active board!</p>
-                </div>
-                <div class="dares-container" id="suggestedDares">
-                    <!-- Dares will be dynamically inserted here -->
-                </div>
-            </section>
-
-            <!-- Completed Dares Section - THIRD -->
-            <section class="dares-section completed-section">
-                <div class="section-header">
-                    <h2>Completed Dares</h2>
-                    <p>Successfully completed challenges!</p>
-                </div>
-                <div class="dares-container" id="completedDares">
-                    <!-- Dares will be dynamically inserted here -->
                 </div>
             </section>
 
@@ -132,7 +87,7 @@
                         </div>
                         <div class="form-group">
                             <label for="initialReward">Initial Reward ($):</label>
-                            <input type="number" id="initialReward" min="5" step="5" value="5" required>
+                            <input type="number" id="initialReward" min="5" step="5" value="50" required>
                         </div>
                         <button type="submit" class="submit-dare-btn">SUBMIT DARE</button>
                     </form>
@@ -154,25 +109,36 @@
                 </div>
             </div>
 
-            <!-- How It Works Modal -->
-            <div id="howItWorksModal" class="modal how-it-works-modal">
-                <div class="modal-content how-it-works-content">
-                    <span class="close">&times;</span>
-                    <div class="how-it-works-header">
-                        <h2>How It Works</h2>
-                    </div>
-                    <div class="story-section">
-                        <p>You have two options, you can either <strong class="do-text">"DO"</strong> or <strong class="dare-text">"DARE"</strong>.</p>
-                        <br>
-                        <p>Darers set dares for the Doers to do on livestream. Darers can also vote on the dares they want to see the most, along with the reward amount.</p>
-                        <br>
-                        <p>Doers do the dares the Darers have set on livestream to claim the reward.</p>
-                        <br>
-                        <p><em>- Rewards are paid from the creator fees.</em></p>
-                    </div>
-                    <button id="closeHowItWorks" class="lets-dare-btn">Lets Do Or Dare!</button>
+            <!-- Dares Section -->
+            <section class="dares-section active-section">
+                <div class="section-header">
+                    <h2>� Active Dares</h2>
+                    <p>These dares are currently being considered!</p>
                 </div>
-            </div>
+                <div class="dares-container" id="activeDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <section class="dares-section suggested-section">
+                <div class="section-header">
+                    <h2>� Suggested Dares</h2>
+                    <p>Vote on your favorite dares to push them to the active board!</p>
+                </div>
+                <div class="dares-container" id="suggestedDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
+
+            <section class="dares-section completed-section">
+                <div class="section-header">
+                    <h2>Completed Dares</h2>
+                    <p>Successfully completed challenges!</p>
+                </div>
+                <div class="dares-container" id="completedDares">
+                    <!-- Dares will be dynamically inserted here -->
+                </div>
+            </section>
 
             <!-- Admin Panel -->
             <div id="adminPanel" class="admin-panel hidden">
@@ -181,6 +147,7 @@
                     <button id="logoutBtn" class="btn btn-secondary">Logout</button>
                 </div>
                 <div class="admin-actions">
+                    <p>Click on any dare to move it between boards</p>
                 </div>
             </div>
         </div>
