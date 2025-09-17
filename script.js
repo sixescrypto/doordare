@@ -25,7 +25,8 @@ let appState = {
         suggestedDares: { currentPage: 1, itemsPerPage: 5 },
         activeDares: { currentPage: 1, itemsPerPage: 5 },
         completedDares: { currentPage: 1, itemsPerPage: 5 }
-    }
+    },
+    lastLocalUpdate: 0 // Timestamp of last local update
 };
 
 // DOM Elements
@@ -33,10 +34,13 @@ const elements = {
     submitDareBtn: document.getElementById('submitDareBtn'),
     adminBtn: document.getElementById('adminBtn'),
     howItWorksBtn: document.getElementById('howItWorksBtn'),
+    contractAddressBtn: document.getElementById('contractAddressBtn'),
     submitModal: document.getElementById('submitModal'),
     adminModal: document.getElementById('adminModal'),
     howItWorksModal: document.getElementById('howItWorksModal'),
+    contractAddressModal: document.getElementById('contractAddressModal'),
     closeHowItWorks: document.getElementById('closeHowItWorks'),
+    closeContractAddress: document.getElementById('closeContractAddress'),
     dareForm: document.getElementById('dareForm'),
     adminForm: document.getElementById('adminForm'),
     suggestedDares: document.getElementById('suggestedDares'),
@@ -74,9 +78,13 @@ function bindEventListeners() {
     elements.submitDareBtn.addEventListener('click', () => openModal('submitModal'));
     elements.adminBtn.addEventListener('click', () => openModal('adminModal'));
     elements.howItWorksBtn.addEventListener('click', () => openModal('howItWorksModal'));
+    elements.contractAddressBtn.addEventListener('click', () => openModal('contractAddressModal'));
     
     // Close How It Works modal with custom button
     elements.closeHowItWorks.addEventListener('click', () => closeModal('howItWorksModal'));
+    
+    // Close Contract Address modal with custom button
+    elements.closeContractAddress.addEventListener('click', () => closeModal('contractAddressModal'));
     
     // Close modal functionality
     document.querySelectorAll('.close').forEach(closeBtn => {
@@ -101,6 +109,21 @@ function bindEventListeners() {
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('admin-btn')) {
             handleAdminAction(e);
+        }
+    });
+    
+    // Voting button delegation with debouncing
+    let votingTimeout = null;
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('vote-btn')) {
+            // Prevent rapid clicking
+            if (votingTimeout) return;
+            
+            votingTimeout = setTimeout(() => {
+                votingTimeout = null;
+            }, 300); // 300ms debounce
+            
+            handleVoting(e);
         }
     });
     
@@ -141,6 +164,11 @@ function handleDareSubmission(e) {
         return;
     }
     
+    if (reward < 5 || reward > 250) {
+        alert('Reward amount must be between $5 and $250');
+        return;
+    }
+    
     const newDare = {
         id: appState.nextDareId++,
         title,
@@ -155,9 +183,11 @@ function handleDareSubmission(e) {
     
     appState.suggestedDares.unshift(newDare);
     resetPagination('suggestedDares'); // Reset to page 1 when new dare is added
-    saveToFirestore();
     renderAllDares();
     closeModal('submitModal');
+    
+    appState.lastLocalUpdate = Date.now();
+    saveToFirestore();
     
     showNotification('Dare submitted successfully!');
 }
@@ -228,8 +258,7 @@ function renderDareSection(containerId, dares, status) {
     
     container.innerHTML = daresHtml + paginationHtml;
     
-    // Bind voting event listeners
-    bindVotingListeners();
+    // Bind pagination event listeners (voting uses event delegation from init)
     bindPaginationListeners(paginationKey);
 }
 
@@ -270,8 +299,9 @@ function handlePaginationClick(e) {
     const page = parseInt(e.target.dataset.page);
     
     appState.pagination[section].currentPage = page;
-    saveToFirestore();
     renderAllDares();
+    appState.lastLocalUpdate = Date.now();
+    saveToFirestore();
 }
 
 function resetPagination(section = null) {
@@ -374,12 +404,6 @@ function getEmptyStateMessage(status) {
 }
 
 // Voting System
-function bindVotingListeners() {
-    document.querySelectorAll('.vote-btn').forEach(btn => {
-        btn.addEventListener('click', handleVoting);
-    });
-}
-
 function handleVoting(e) {
     const dareId = parseInt(e.target.dataset.id);
     const voteType = e.target.dataset.type; // 'up' or 'down'
@@ -439,14 +463,21 @@ function handleVoting(e) {
         dare.reward += rewardChange;
         dare.rewardVotes += voteChange;
         
-        // Prevent reward from going below $5
+        // Prevent reward from going below $5 or above $250
         if (dare.reward < 5) {
             dare.reward = 5;
         }
+        if (dare.reward > 250) {
+            dare.reward = 250;
+        }
     }
     
-    saveToFirestore();
+    // Update UI immediately for the person voting (single flicker)
     renderAllDares();
+    
+    // Mark timestamp and save to Firebase
+    appState.lastLocalUpdate = Date.now();
+    saveToFirestore();
 }
 
 // Admin Actions
@@ -496,8 +527,9 @@ function handleAdminAction(e) {
             break;
     }
     
-    saveToFirestore();
     renderAllDares();
+    appState.lastLocalUpdate = Date.now();
+    saveToFirestore();
 }
 
 // Utility Functions
@@ -532,16 +564,26 @@ function deleteDare(dareId) {
 function showNotification(message) {
     // Create a simple notification
     const notification = document.createElement('div');
+    
+    // Check if it's mobile
+    const isMobile = window.innerWidth <= 768;
+    const padding = isMobile ? '7px 10px' : '15px 20px';
+    const fontSize = isMobile ? '0.7rem' : '1rem';
+    const borderRadius = isMobile ? '4px' : '8px';
+    const top = isMobile ? '110px' : '80px'; // Position below header on mobile
+    const right = isMobile ? '10px' : '20px';
+    
     notification.style.cssText = `
         position: fixed;
-        top: 80px;
-        right: 20px;
+        top: ${top};
+        right: ${right};
         background: #ff0000;
         color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
+        padding: ${padding};
+        border-radius: ${borderRadius};
         z-index: 1000;
         font-weight: 600;
+        font-size: ${fontSize};
         box-shadow: 0 5px 15px rgba(0,0,0,0.3);
     `;
     notification.textContent = message;
@@ -995,6 +1037,13 @@ async function loadFromFirestore() {
 function setupRealtimeListener() {
     db.collection('appData').doc('dares').onSnapshot((doc) => {
         if (doc.exists) {
+            // Skip re-render if this update happened within 1 second of our local update
+            const timeSinceLocalUpdate = Date.now() - appState.lastLocalUpdate;
+            if (timeSinceLocalUpdate < 1000) {
+                console.log('Skipping real-time update (recent local change)');
+                return;
+            }
+            
             const data = doc.data();
             appState.suggestedDares = data.suggestedDares || [];
             appState.activeDares = data.activeDares || [];
@@ -1089,6 +1138,7 @@ function addSampleData() {
         }
     });
     
+    appState.lastLocalUpdate = Date.now();
     saveToFirestore();
 }
 

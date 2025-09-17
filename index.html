@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Do or Dare - Pumpfun Challenge Platform</title>
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="shortcut icon" href="favicon.ico">
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Do or Dare - Pumpfun Challenge Platform">
+    <meta property="og:description" content="Are you up for the challenge?">
+    <meta property="og:image" content="https://doordare.fun/Doordareembed.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:url" content="https://doordare.fun">
+    <meta property="og:site_name" content="Do or Dare">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Do or Dare - Pumpfun Challenge Platform">
+    <meta name="twitter:description" content="Are you up for the challenge?">
+    <meta name="twitter:image" content="https://doordare.fun/Doordareembed.png">
+    
+    <!-- Standard Meta Description -->
+    <meta name="description" content="Are you up for the challenge?">
+    
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
@@ -15,6 +42,9 @@
     <!-- Header -->
     <header class="header">
         <div class="container">
+            <div class="header-left">
+                <button id="contractAddressBtn" class="btn btn-secondary">CONTRACT ADDRESS</button>
+            </div>
             <div class="header-logo-section">
                 <div class="logo">
                     <img src="Doordare.png" alt="Do or Dare" class="logo-image">
@@ -67,14 +97,7 @@
                                 <span class="live-dot"></span>
                                 <span>LOADING</span>
                             </div>
-                                        const firebaseConfig = {
-                          apiKey: "your-api-key-here",
-                          authDomain: "your-project.firebaseapp.com",
-                          projectId: "your-project-id",
-                          storageBucket: "your-project.appspot.com",
-                          messagingSenderId: "123456789",
-                          appId: "your-app-id"
-                        };        </div>
+                                                </div>
                     </div>
                     <div class="stream-controls stream-controls-bottom">
                         <button id="toggleStreamBottom" class="stream-btn">Hide Stream</button>
@@ -132,7 +155,7 @@
                         </div>
                         <div class="form-group">
                             <label for="initialReward">Initial Reward ($):</label>
-                            <input type="number" id="initialReward" min="5" step="5" value="5" required>
+                            <input type="number" id="initialReward" min="5" max="250" step="5" value="5" required>
                         </div>
                         <button type="submit" class="submit-dare-btn">SUBMIT DARE</button>
                     </form>
@@ -169,8 +192,26 @@
                         <p>Doers do the dares the Darers have set on livestream to claim the reward.</p>
                         <br>
                         <p><em>- Rewards are paid from the creator fees.</em></p>
+                        <br>
+                        <div class="challenge-banner">
+                            <img src="Banner.jpg" alt="Are You Up To The Challenge?" class="challenge-image">
+                        </div>
                     </div>
                     <button id="closeHowItWorks" class="lets-dare-btn">Lets Do Or Dare!</button>
+                </div>
+            </div>
+
+            <!-- Contract Address Modal -->
+            <div id="contractAddressModal" class="modal contract-address-modal">
+                <div class="modal-content contract-address-content">
+                    <span class="close">&times;</span>
+                    <div class="contract-address-header">
+                        <h2>Contract Address</h2>
+                    </div>
+                    <div class="contract-section">
+                        <p class="coming-soon-text">Coming Soon!</p>
+                    </div>
+                    <button id="closeContractAddress" class="lets-dare-btn">Close</button>
                 </div>
             </div>
 
